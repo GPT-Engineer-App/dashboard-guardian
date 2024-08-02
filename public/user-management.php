@@ -7,8 +7,13 @@ require_super_user();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['create_user'])) {
         $username = $_POST['username'];
-        $password = password_hash($_POST['password']);
+        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $role = $_POST['role'];
+
+        // If no password is provided, use a hashed version of 'password'
+        if (empty($_POST['password'])) {
+            $password = password_hash('password', PASSWORD_DEFAULT);
+        }
 
         $stmt = $pdo->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
         $stmt->execute([$username, $password, $role]);
